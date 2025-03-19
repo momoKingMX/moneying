@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在上班中</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @keyframes coinFlow {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .coin {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #FFD700, #DAA520);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+            animation: coinFlow 3s linear infinite;
+            left: ${Math.random() * 100}%;
+        }
+
+        .coin::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.8;
+        }
+
+        .coin::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 50%, rgba(255, 255, 255, 0.3) 100%);
+            animation: twinkle 1s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gold-container">
+        <h1>⏰ 正在上班中 ⏰</h1>
+        <div class="time-display" style="margin-bottom: 30px;">
+            已上班时间：<span id="timer">00:00:00.000</span>
+        </div>
+        <div class="earned-display" style="margin-bottom: 30px;">
+            已赚金额：<span id="earnedAmount">0.00</span> 元
+        </div>
+        <button id="stopBtn" onclick="stopWorking()" style="margin-top: 20px;">下班</button>
+    </div>
+    <script src="working.js"></script>
+    <div id="coinContainer"></div>
+    <script>
+        let isBonusActive = false;
+        let lastMultiple = 0;
+
+        function createCoin(isBonus = false) {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.style.left = `${Math.random() * 100}%`;
+            coin.style.top = `-100px`;
+            coin.style.animationDuration = `3s`;
+            coin.style.width = `30px`;
+            coin.style.height = `30px`;
+            
+            if (isBonus) {
+                coin.style.animationDuration = `${1 + Math.random() * 2}s`;
+                coin.style.width = `${20 + Math.random() * 20}px`;
+                coin.style.height = coin.style.width;
+                coin.style.opacity = '1';
+                setTimeout(() => {
+                    coin.style.transition = 'opacity 1s';
+                    coin.style.opacity = '0';
+                }, 2000);
+            }
+
+            document.getElementById('coinContainer').appendChild(coin);
+            setTimeout(() => {
+                coin.remove();
+            }, 5000);
+        }
+
+        setInterval(() => {
+            if (!isBonusActive) {
+                createCoin();
+            }
+        }, 100);
+
+        function checkBonus(earnedAmount) {
+            const currentMultiple = Math.floor(earnedAmount / 10);
+            if (currentMultiple > lastMultiple) {
+                lastMultiple = currentMultiple;
+                isBonusActive = true;
+                for (let i = 0; i < 20; i++) {
+                    createCoin(true);
+                }
+                setTimeout(() => {
+                    isBonusActive = false;
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
